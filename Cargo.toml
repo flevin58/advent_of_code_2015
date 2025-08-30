@@ -8,3 +8,4 @@ name = "common"
 path = "src/lib.rs"
 
 [dependencies]
+md5 = "0.8.0"
