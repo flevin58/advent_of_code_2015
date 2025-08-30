@@ -5,7 +5,7 @@ pub fn run() {
     let mut wires = Wires::from_input_data(&input_data);
     wires.compute();
     println!(
-        "Part1: value on wire 'a': {:?}",
-        wires.get_wire("a").unwrap()
+        "Part1: value on wire 'a': {}",
+        wires.get_wire_signal("a").unwrap()
     );
 }

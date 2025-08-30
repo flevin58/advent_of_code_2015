@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 macro_rules! signal_or_wire {
     ($x:expr) => {
         if let Ok(signal) = $x.parse::<u16>() {
@@ -46,26 +44,6 @@ impl Debug for Type {
 }
 
 impl Type {
-    pub fn is_signal(&self) -> bool {
-        matches!(self, Type::Signal(_))
-    }
-
-    pub fn is_wire(&self) -> bool {
-        matches!(self, Type::Wire(_))
-    }
-
-    pub fn is_gate(&self) -> bool {
-        matches!(self, Type::Gate(_))
-    }
-
-    pub fn is_none(&self) -> bool {
-        matches!(self, Type::None)
-    }
-
-    pub fn is_known(&self) -> bool {
-        !matches!(self, Type::None | Type::Wire(_))
-    }
-
     pub fn get_signal_value(&self) -> Option<u16> {
         if let Type::Signal(value) = self {
             Some(*value)
@@ -80,32 +58,6 @@ pub struct Component {
     ctype: Type,
     left: Type,
     right: Type,
-}
-
-impl Debug for Component {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match &self.ctype {
-            Type::Gate(name) => {
-                if self.left != Type::None {
-                    write!(f, "{:?} ", self.left)?;
-                }
-                write!(f, "{name} ")?;
-                if self.right != Type::None {
-                    write!(f, "{:?} ", self.right)?;
-                }
-            }
-            Type::Signal(value) => {
-                write!(f, "{:?}", value)?;
-            }
-            Type::Wire(name) => {
-                write!(f, "{:?}", name)?;
-            }
-            Type::None => {
-                write!(f, "None")?;
-            }
-        }
-        Ok(())
-    }
 }
 
 impl Display for Component {
@@ -173,28 +125,10 @@ impl Component {
             }
         }
     }
-
-    pub fn is_gate(&self, gate_name: &str) -> bool {
-        if let Type::Gate(name) = &self.ctype {
-            name == gate_name
-        } else {
-            false
-        }
-    }
 }
 
 #[derive(Clone)]
 pub struct Wires(HashMap<String, Component>);
-
-impl Debug for Wires {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "Wires:")?;
-        for (wname, wtype) in &self.0 {
-            writeln!(f, "{} = {:?}", wname, wtype)?;
-        }
-        Ok(())
-    }
-}
 
 impl Display for Wires {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -211,8 +145,10 @@ impl Wires {
         Self(HashMap::new())
     }
 
-    pub fn get_wire(&self, name: &str) -> Option<&Component> {
-        self.0.get(name)
+    pub fn get_wire_signal(&self, name: &str) -> Option<u16> {
+        self.0
+            .get(name)
+            .and_then(|comp| comp.ctype.get_signal_value())
     }
 
     pub fn set_wire_signal(&mut self, name: &str, value: u16) {
