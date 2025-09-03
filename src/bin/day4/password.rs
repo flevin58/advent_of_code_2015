@@ -13,22 +13,19 @@ pub fn lowest_number_with_n_leading_zeros(door_id: &str, n: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn test_md5() {
-        let input = "abcdef609043";
+    use test_case::test_case;
+
+    #[test_case("abcdef609043", "000001dbbfa3a5c83a2d506429c7b00e"; "t1")]
+    fn md5_digest(input: &str, expected: &str) {
         let digest = md5::compute(input);
         let hash_string = format!("{:x}", digest);
-        assert_eq!(hash_string, "000001dbbfa3a5c83a2d506429c7b00e");
+        assert_eq!(hash_string, expected);
     }
 
-    #[test]
-    fn test_lowest_number_with_n_leading_zeros() {
-        type TestCase = (&'static str, usize, usize);
-        const TEST_CASES: [TestCase; 2] = [("abcdef", 5, 609043), ("pqrstuv", 5, 1048970)];
-
-        for tc in TEST_CASES {
-            let result = super::lowest_number_with_n_leading_zeros(tc.0, tc.1);
-            assert_eq!(result, tc.2);
-        }
+    #[test_case("abcdef", 5, 609043; "t1")]
+    #[test_case("pqrstuv", 5, 1048970; "t2")]
+    fn lowest_number_with_n_leading_zeros(input: &str, zeroes: usize, expected: usize) {
+        let result = super::lowest_number_with_n_leading_zeros(input, zeroes);
+        assert_eq!(result, expected);
     }
 }

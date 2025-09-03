@@ -17,15 +17,12 @@ pub fn run() {
 
 #[cfg(test)]
 mod tests {
-    type TestCase = (&'static str, u32);
+    use test_case::test_case;
 
-    const TEST_CASES: [TestCase; 2] = [("2x3x4", 58), ("1x1x10", 43)];
-
-    #[test]
-    fn test_amount_of_wrapping_paper() {
-        for tc in TEST_CASES {
-            let result = super::amount_of_wrapping_paper(tc.0);
-            assert_eq!(result, tc.1);
-        }
+    #[test_case("2x3x4", 58; "measure 2x3x4")]
+    #[test_case("1x1x10", 43; "measure 1x1x10")]
+    fn amount_of_wrapping_paper(measures: &str, expected: u32) {
+        let result = super::amount_of_wrapping_paper(measures);
+        assert_eq!(result, expected);
     }
 }

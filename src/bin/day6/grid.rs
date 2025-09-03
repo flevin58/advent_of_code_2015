@@ -44,6 +44,9 @@ impl Grid {
     }
 
     pub fn apply_action(&mut self, s: &str) {
+        if cfg!(test) && s.is_empty() {
+            return;
+        }
         let parts: Vec<&str> = s.split_whitespace().collect();
         match parts[0] {
             "turn" => match parts[1] {
@@ -121,16 +124,17 @@ impl Grid {
 #[cfg(test)]
 mod tests {
     use super::{Grid, Pos, Rect};
+    use test_case::test_case;
 
     #[test]
-    fn test_pos_from_coords() {
+    fn pos_from_coords() {
         let pos = Pos::from_coords("10,20");
         assert_eq!(pos.0, 10);
         assert_eq!(pos.1, 20);
     }
 
     #[test]
-    fn test_rect_from_coords() {
+    fn rect_from_coords() {
         let rect = Rect::from_coords("0,0", "999,999");
         assert_eq!(rect.0.0, 0);
         assert_eq!(rect.0.1, 0);
@@ -138,27 +142,37 @@ mod tests {
         assert_eq!(rect.1.1, 999);
     }
 
-    #[test]
-    fn test_grid_operations() {
+    #[test_case(
+        "turn on 0,0 through 999,999",
+        "",
+        "",
+        1_000_000;
+        "turn on lights")]
+    #[test_case(
+        "turn on 0,0 through 999,999",
+        "toggle 0,0 through 999,0",
+        "",
+        999_000;
+        "toggle lights")]
+    #[test_case(
+        "turn on 0,0 through 999,999",
+        "toggle 0,0 through 999,0",
+        "turn off 499,499 through 500,500",
+        998_996;
+        "turn off lights")]
+    fn grid_operations(action1: &str, action2: &str, action3: &str, expected: usize) {
         let mut grid = Grid::new(false);
-        grid.apply_action("turn on 0,0 through 999,999");
-        assert_eq!(grid.count_lights_on(), 1_000_000);
-
-        grid.apply_action("toggle 0,0 through 999,0");
-        assert_eq!(grid.count_lights_on(), 999_000);
-
-        grid.apply_action("turn off 499,499 through 500,500");
-        assert_eq!(grid.count_lights_on(), 998_996);
+        grid.apply_action(action1);
+        grid.apply_action(action2);
+        grid.apply_action(action3);
+        assert_eq!(grid.count_lights_on(), expected);
     }
 
-    #[test]
-    fn test_brightness_operations() {
+    #[test_case("turn on 0,0 through 0,0",1 ; "turn on action")]
+    #[test_case("toggle 0,0 through 999,999",2_000_000 ; "toggle action")]
+    fn brightness_operations(action: &str, expected: usize) {
         let mut grid = Grid::new(true);
-        grid.apply_action("turn on 0,0 through 0,0");
-        assert_eq!(grid.sum_brightness(), 1);
-
-        grid.clear();
-        grid.apply_action("toggle 0,0 through 999,999");
-        assert_eq!(grid.sum_brightness(), 2_000_000);
+        grid.apply_action(action);
+        assert_eq!(grid.sum_brightness(), expected);
     }
 }

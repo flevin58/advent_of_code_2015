@@ -15,35 +15,29 @@ pub fn run() {
 #[cfg(test)]
 mod tests {
     use crate::prism::Prism;
+    use test_case::test_case;
 
-    type TestCase = (&'static str, u32, u32, u32);
-
-    const TEST_CASES: [TestCase; 2] = [("2x3x4", 10, 24, 34), ("1x1x10", 4, 10, 14)];
-
-    #[test]
-    fn test_amount_of_ribbon() {
-        for tc in TEST_CASES {
-            let prism = Prism::from_str(tc.0);
-            let ribbon = prism.smallest_perimeter();
-            assert_eq!(ribbon, tc.1);
-        }
+    #[test_case("2x3x4", 10; "measure 2x3x4")]
+    #[test_case("1x1x10", 4; "measure 1x1x10")]
+    fn amount_of_ribbon(measures: &str, expected: u32) {
+        let prism = Prism::from_str(measures);
+        let ribbon = prism.smallest_perimeter();
+        assert_eq!(ribbon, expected);
     }
 
-    #[test]
-    fn test_perfect_bow() {
-        for tc in TEST_CASES {
-            let prism = Prism::from_str(tc.0);
-            let ribbon = prism.volume();
-            assert_eq!(ribbon, tc.2);
-        }
+    #[test_case("2x3x4", 24; "measure 2x3x4")]
+    #[test_case("1x1x10", 10; "measure 1x1x10")]
+    fn perfect_bow(measures: &str, expected: u32) {
+        let prism = Prism::from_str(measures);
+        let ribbon = prism.volume();
+        assert_eq!(ribbon, expected);
     }
 
-    #[test]
-    fn test_total_ribbon() {
-        for tc in TEST_CASES {
-            let prism = Prism::from_str(tc.0);
-            let ribbon = prism.total_ribbon();
-            assert_eq!(ribbon, tc.3)
-        }
+    #[test_case("2x3x4", 34; "measure 2x3x4")]
+    #[test_case("1x1x10", 14; "measure 1x1x10")]
+    fn total_ribbon(measures: &str, expected: u32) {
+        let prism = Prism::from_str(measures);
+        let ribbon = prism.total_ribbon();
+        assert_eq!(ribbon, expected);
     }
 }

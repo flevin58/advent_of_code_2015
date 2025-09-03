@@ -79,34 +79,23 @@ pub fn part2_delta_chars(line: &str) -> usize {
 
 mod tests {
     use crate::delta::{part1_delta_chars, part2_delta_chars};
+    use test_case::{test_case, test_matrix};
 
-    #[test]
-    fn test_part1_delta_chars() {
-        let delta = part1_delta_chars(r#""""#);
-        assert_eq!(delta, 2);
-
-        let delta = part1_delta_chars(r#""abc""#);
-        assert_eq!(delta, 2);
-
-        let delta = part1_delta_chars(r#""aaa\"aaa""#);
-        assert_eq!(delta, 3);
-
-        let delta = part1_delta_chars(r#""\x27""#);
-        assert_eq!(delta, 5);
+    #[test_case(r#""""#, 2 ; "empty line") ]
+    #[test_case(r#""abc""#, 2 ; "with quoted string") ]
+    #[test_case(r#""aaa\"aaa""#, 3 ; "with escaped double quote") ]
+    #[test_case(r#""\x27""#, 5 ; "with escaped hex char") ]
+    fn part1_delta(line: &str, expected: usize) {
+        let delta = part1_delta_chars(line);
+        assert_eq!(delta, expected);
     }
 
-    #[test]
-    fn test_part2_delta_chars() {
-        let delta = part2_delta_chars(r#""""#);
-        assert_eq!(delta, 4);
-
-        let delta = part2_delta_chars(r#""abc""#);
-        assert_eq!(delta, 4);
-
-        let delta = part2_delta_chars(r#""aaa\"aaa""#);
-        assert_eq!(delta, 6);
-
-        let delta = part2_delta_chars(r#""\x27""#);
-        assert_eq!(delta, 5);
+    #[test_case(r#""""#, 4 ; "empty line") ]
+    #[test_case(r#""abc""#, 4 ; "with quoted string") ]
+    #[test_case(r#""aaa\"aaa""#, 6 ; "with escaped double quote") ]
+    #[test_case(r#""\x27""#, 5 ; "with escaped hex char") ]
+    fn part2_delta(line: &str, expected: usize) {
+        let delta = part2_delta_chars(line);
+        assert_eq!(delta, expected);
     }
 }

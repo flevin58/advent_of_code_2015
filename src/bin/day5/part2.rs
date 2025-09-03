@@ -26,20 +26,14 @@ pub fn run() {
 
 #[cfg(test)]
 mod tests {
-    type TestCase = (&'static str, bool);
+    use test_case::test_case;
 
-    const TEST_CASES: [TestCase; 4] = [
-        ("qjhvhtzxzqqjkmpb", true),
-        ("xxyxx", true),
-        ("uurcxstgmygtbstg", false),
-        ("ieodomkazucvgmuy", false),
-    ];
-
-    #[test]
-    fn test_is_nice() {
-        for tc in TEST_CASES {
-            let result = super::is_nice(tc.0);
-            assert_eq!(result, tc.1);
-        }
+    #[test_case("qjhvhtzxzqqjkmpb", true; "t2.1")]
+    #[test_case("xxyxx", true; "t2.2")]
+    #[test_case("uurcxstgmygtbstg", false; "t2.3")]
+    #[test_case("ieodomkazucvgmuy", false; "t2.4")]
+    fn test_is_nice(input: &str, expected: bool) {
+        let result = super::is_nice(input);
+        assert_eq!(result, expected);
     }
 }

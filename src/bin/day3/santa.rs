@@ -48,44 +48,32 @@ pub fn visited_houses_with_robot(directions: &str) -> usize {
 
 #[cfg(test)]
 mod tests {
+    use super::Pos;
+    use test_case::test_case;
 
-    #[test]
-    fn test_new_house() {
-        use super::Pos;
-        type TestCase = (char, Pos);
-        const TEST_CASES: [TestCase; 4] = [
-            ('>', Pos(1, 0)),
-            ('<', Pos(-1, 0)),
-            ('^', Pos(0, 1)),
-            ('v', Pos(0, -1)),
-        ];
-
-        for tc in TEST_CASES {
-            let start = Pos(0, 0);
-            let end = start.new_from_direction(tc.0);
-            assert_eq!(end, tc.1);
-        }
+    #[test_case('>', Pos(1, 0); "move right")]
+    #[test_case('<', Pos(-1, 0); "move left")]
+    #[test_case('^', Pos(0, 1); "move up")]
+    #[test_case('v', Pos(0, -1); "move down")]
+    fn new_house(direction: char, expected: Pos) {
+        let start = Pos(0, 0);
+        let end = start.new_from_direction(direction);
+        assert_eq!(end, expected);
     }
 
-    #[test]
-    fn test_visited_houses() {
-        type TestCase = (&'static str, usize);
-        const TEST_CASES: [TestCase; 3] = [(">", 2), ("^>v<", 4), ("^v^v^v^v^v", 2)];
-
-        for tc in TEST_CASES {
-            let result = super::visited_houses(tc.0);
-            assert_eq!(result, tc.1);
-        }
+    #[test_case(">", 2; "t1")]
+    #[test_case("^>v<", 4; "t2")]
+    #[test_case("^v^v^v^v^v", 2; "t3")]
+    fn visited_houses(directions: &str, expected: usize) {
+        let result = super::visited_houses(directions);
+        assert_eq!(result, expected);
     }
 
-    #[test]
-    fn test_visited_houses_with_robot() {
-        type TestCase = (&'static str, usize);
-        const TEST_CASES: [TestCase; 3] = [("^v", 3), ("^>v<", 3), ("^v^v^v^v^v", 11)];
-
-        for tc in TEST_CASES {
-            let result = super::visited_houses_with_robot(tc.0);
-            assert_eq!(result, tc.1);
-        }
+    #[test_case("^v", 3; "t1")]
+    #[test_case("^>v<", 3; "t2")]
+    #[test_case("^v^v^v^v^v", 11; "t3")]
+    fn visited_houses_with_robot(directions: &str, expected: usize) {
+        let result = super::visited_houses_with_robot(directions);
+        assert_eq!(result, expected);
     }
 }

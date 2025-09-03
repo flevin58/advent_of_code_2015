@@ -20,25 +20,20 @@ pub fn run() {
 
 #[cfg(test)]
 mod tests {
-    type TestCase = (&'static str, isize);
+    use test_case::test_case;
 
-    const TEST_CASES: [TestCase; 9] = [
-        ("(())", 0),
-        ("()()", 0),
-        ("(((", 3),
-        ("(()(()(", 3),
-        ("))(((((", 3),
-        ("())", -1),
-        ("))(", -1),
-        (")))", -3),
-        (")())())", -3),
-    ];
+    #[test_case("(())", 0; "t1")]
+    #[test_case("()()", 0; "t2")]
+    #[test_case("(((", 3; "t3")]
+    #[test_case("(()(()(", 3; "t4")]
+    #[test_case("))(((((", 3; "t5")]
+    #[test_case("())", -1; "t6")]
+    #[test_case("))(", -1; "t7")]
+    #[test_case(")))", -3; "t8")]
+    #[test_case(")())())", -3; "t9")]
 
-    #[test]
-    fn test_floor_number_from_string() {
-        for tc in TEST_CASES {
-            let result = super::floor_number_from_string(tc.0.into());
-            assert_eq!(result, tc.1);
-        }
+    fn floor_number_from_string(direction: &str, expected: isize) {
+        let result = super::floor_number_from_string(direction.into());
+        assert_eq!(result, expected);
     }
 }

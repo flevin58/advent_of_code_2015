@@ -268,21 +268,18 @@ impl Wires {
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn test_get_signal_type() {
-        use super::Type;
+    use super::Type;
+    use test_case::test_case;
 
-        let signal = Type::Signal(123);
-        let wire = Type::Wire("x".to_string());
-        let none = Type::None;
-
-        assert_eq!(signal.get_signal_value(), Some(123));
-        assert_eq!(wire.get_signal_value(), None);
-        assert_eq!(none.get_signal_value(), None);
+    #[test_case(Type::Signal(123_u16), Some(123_u16); "Signal")]
+    #[test_case(Type::Wire("x".to_string()), None; "Wire")]
+    #[test_case(Type::None, None; "None")]
+    fn get_signal_value(ty: Type, expected: Option<u16>) {
+        assert_eq!(ty.get_signal_value(), expected);
     }
 
     #[test]
-    fn test_compute() {
+    fn compute() {
         use super::Wires;
 
         let test_data = r#"

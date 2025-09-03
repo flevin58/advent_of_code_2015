@@ -23,15 +23,12 @@ pub fn run() {
 
 #[cfg(test)]
 mod tests {
-    type TestCase = (&'static str, usize);
+    use test_case::test_case;
 
-    const TEST_CASES: [TestCase; 2] = [(")", 1), ("()())", 5)];
-
-    #[test]
-    fn test_index_of_basement() {
-        for tc in TEST_CASES {
-            let result = super::index_of_basement(tc.0.into());
-            assert_eq!(result, tc.1);
-        }
+    #[test_case(")", 1; "t1")]
+    #[test_case("()())", 5; "t2")]
+    fn index_of_basement(directions: &str, expected: usize) {
+        let result = super::index_of_basement(directions.into());
+        assert_eq!(result, expected);
     }
 }
