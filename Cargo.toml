@@ -11,4 +11,5 @@ path = "src/lib.rs"
 test-case = "*"
 
 [dependencies]
+itertools = "0.14.0"
 md5 = "0.8.0"
