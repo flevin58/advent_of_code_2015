@@ -13,3 +13,4 @@ test-case = "*"
 [dependencies]
 itertools = "0.14.0"
 md5 = "0.8.0"
+serde_json = "1.0.143"
