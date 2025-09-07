@@ -1,15 +1,15 @@
 use crate::prism::Prism;
-use common::read_input;
 
 fn total_ribbon(single_line: &str) -> u32 {
     let prism = Prism::from_str(single_line);
     prism.total_ribbon()
 }
 
-pub fn run() {
-    let input_data = read_input!("day2");
-    let total_sum: u32 = input_data.lines().map(|line| total_ribbon(line)).sum();
+pub fn run() -> Result<(), String> {
+    let input = common::read_input(2)?;
+    let total_sum: u32 = input.lines().map(|line| total_ribbon(line)).sum();
     println!("Total wrapping paper = {}", total_sum);
+    Ok(())
 }
 
 #[cfg(test)]

@@ -1,7 +1,8 @@
 use crate::santa;
 
-pub fn run() {
-    let input_data = common::read_input!("day3");
-    let total_houses = santa::visited_houses(&input_data);
+pub fn run() -> Result<(), String> {
+    let input = common::read_input(3)?;
+    let total_houses = santa::visited_houses(&input);
     println!("Visited houses: {}", total_houses);
+    Ok(())
 }

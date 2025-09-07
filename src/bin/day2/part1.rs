@@ -1,18 +1,18 @@
 use crate::prism::Prism;
-use common::read_input;
 
 fn amount_of_wrapping_paper(single_line: &str) -> u32 {
     let prism = Prism::from_str(single_line);
     prism.total_wrapping_paper()
 }
 
-pub fn run() {
-    let input_data = read_input!("day2");
-    let total_sum: u32 = input_data
+pub fn run() -> Result<(), String> {
+    let input = common::read_input(2)?;
+    let total_sum: u32 = input
         .lines()
         .map(|line| amount_of_wrapping_paper(line))
         .sum();
     println!("Total wrapping paper = {}", total_sum);
+    Ok(())
 }
 
 #[cfg(test)]
