@@ -10,7 +10,7 @@ macro_rules! signal_or_wire {
 
 use std::{
     collections::HashMap,
-    fmt::{Debug, Display},
+    fmt::{Debug, Display, Error},
 };
 
 #[derive(Clone, PartialEq)]
@@ -79,7 +79,7 @@ impl Display for Component {
                 write!(f, "{name}")?;
             }
             _ => {
-                write!(f, "Invalid Component")?;
+                return Err(std::fmt::Error);
             }
         }
         Ok(())
