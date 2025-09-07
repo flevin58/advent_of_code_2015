@@ -22,10 +22,11 @@ fn is_nice(s: &str) -> bool {
     true
 }
 
-pub fn run() {
-    let input_data = common::read_input!("day5");
-    let count = input_data.lines().filter(|line| is_nice(line)).count();
+pub fn run() -> Result<(), String> {
+    let input = common::read_input(5)?;
+    let count = input.lines().filter(|line| is_nice(line)).count();
     println!("Number of 'nice' strings: {count}");
+    Ok(())
 }
 
 #[cfg(test)]
