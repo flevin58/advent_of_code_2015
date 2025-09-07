@@ -34,16 +34,8 @@ impl Grid {
         }
     }
 
-    #[cfg(test)]
-    pub fn clear(&mut self) {
-        for i in 0..GRID_SIZE {
-            for j in 0..GRID_SIZE {
-                self.lights[i][j] = 0;
-            }
-        }
-    }
-
     pub fn apply_action(&mut self, s: &str) {
+        // Allow no action when s is empty (test only!)
         if cfg!(test) && s.is_empty() {
             return;
         }
