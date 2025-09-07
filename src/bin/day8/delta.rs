@@ -79,7 +79,7 @@ pub fn part2_delta_chars(line: &str) -> usize {
 
 mod tests {
     use crate::delta::{part1_delta_chars, part2_delta_chars};
-    use test_case::{test_case, test_matrix};
+    use test_case::test_case;
 
     #[test_case(r#""""#, 2 ; "empty line") ]
     #[test_case(r#""abc""#, 2 ; "with quoted string") ]
