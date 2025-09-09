@@ -1,34 +1,35 @@
+use common::error::{AocError, Result};
 use std::collections::HashSet;
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
 struct Pos(i32, i32);
 
 impl Pos {
-    fn new_from_direction(self, direction: char) -> Self {
+    fn new_from_direction(self, direction: char) -> Result<Self> {
         let (mut x, mut y) = (self.0, self.1);
         match direction {
             '>' => x += 1,
             '<' => x -= 1,
             '^' => y += 1,
             'v' => y -= 1,
-            _ => panic!("Invalid direction"),
+            ch => return Err(AocError::CharParseError(ch)),
         }
-        Self(x, y)
+        Ok(Self(x, y))
     }
 }
 
-pub fn visited_houses(directions: &str) -> usize {
+pub fn visited_houses(directions: &str) -> Result<usize> {
     let mut houses = HashSet::<Pos>::new();
     let mut house = Pos(0, 0);
     houses.insert(house);
     for direction in directions.chars() {
-        house = house.new_from_direction(direction);
+        house = house.new_from_direction(direction)?;
         houses.insert(house);
     }
-    houses.len()
+    Ok(houses.len())
 }
 
-pub fn visited_houses_with_robot(directions: &str) -> usize {
+pub fn visited_houses_with_robot(directions: &str) -> Result<usize> {
     let mut houses = HashSet::<Pos>::new();
     let mut santa_house = Pos(0, 0);
     let mut robot_house = Pos(0, 0);
@@ -36,14 +37,14 @@ pub fn visited_houses_with_robot(directions: &str) -> usize {
     houses.insert(robot_house);
     for (i, direction) in directions.chars().enumerate() {
         if i % 2 == 0 {
-            santa_house = santa_house.new_from_direction(direction);
+            santa_house = santa_house.new_from_direction(direction)?;
             houses.insert(santa_house);
         } else {
-            robot_house = robot_house.new_from_direction(direction);
+            robot_house = robot_house.new_from_direction(direction)?;
             houses.insert(robot_house);
         }
     }
-    houses.len()
+    Ok(houses.len())
 }
 
 #[cfg(test)]
@@ -57,7 +58,7 @@ mod tests {
     #[test_case('v', Pos(0, -1); "move down")]
     fn new_house(direction: char, expected: Pos) {
         let start = Pos(0, 0);
-        let end = start.new_from_direction(direction);
+        let end = start.new_from_direction(direction).unwrap();
         assert_eq!(end, expected);
     }
 
@@ -65,7 +66,7 @@ mod tests {
     #[test_case("^>v<", 4; "t2")]
     #[test_case("^v^v^v^v^v", 2; "t3")]
     fn visited_houses(directions: &str, expected: usize) {
-        let result = super::visited_houses(directions);
+        let result = super::visited_houses(directions).unwrap();
         assert_eq!(result, expected);
     }
 
@@ -73,7 +74,7 @@ mod tests {
     #[test_case("^>v<", 3; "t2")]
     #[test_case("^v^v^v^v^v", 11; "t3")]
     fn visited_houses_with_robot(directions: &str, expected: usize) {
-        let result = super::visited_houses_with_robot(directions);
+        let result = super::visited_houses_with_robot(directions).unwrap();
         assert_eq!(result, expected);
     }
 }

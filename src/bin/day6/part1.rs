@@ -1,10 +1,11 @@
 use crate::grid::Grid;
+use common::error::Result;
 
-pub fn run() -> Result<(), String> {
+pub fn run() -> Result<()> {
     let input = common::read_input(6)?;
     let mut grid = Grid::new(false);
     for line in input.lines() {
-        grid.apply_action(line);
+        grid.apply_action(line)?;
     }
     let count = grid.count_lights_on();
     println!("Number of lights on: {count}");

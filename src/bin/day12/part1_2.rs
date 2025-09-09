@@ -25,12 +25,13 @@ impl Sum for Value {
     }
 }
 
-pub fn run() {
-    let input_data = common::read_input!("day12");
-    let v: Value = serde_json::from_str(&input_data).unwrap();
+pub fn run() -> Result<(), String> {
+    let input = common::read_input(12)?;
+    let v: Value = serde_json::from_str(&input).unwrap();
 
     println!("Sum: {}", v.sum(false));
     println!("Sum without red: {}", v.sum(true));
+    Ok(())
 }
 
 #[cfg(test)]

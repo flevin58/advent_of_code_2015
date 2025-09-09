@@ -8,9 +8,10 @@ macro_rules! signal_or_wire {
     };
 }
 
+use common::error::{AocError, Result};
 use std::{
     collections::HashMap,
-    fmt::{Debug, Display, Error},
+    fmt::{Debug, Display},
 };
 
 #[derive(Clone, PartialEq)]
@@ -78,8 +79,8 @@ impl Display for Component {
             Type::Wire(name) => {
                 write!(f, "{name}")?;
             }
-            _ => {
-                return Err(std::fmt::Error);
+            Type::None => {
+                write!(f, "None")?;
             }
         }
         Ok(())
@@ -87,41 +88,46 @@ impl Display for Component {
 }
 
 impl Component {
-    pub fn from_str(line: &str) -> Self {
+    pub fn from_str(line: &str) -> Result<Self> {
         let parts: Vec<&str> = line.split_whitespace().collect();
 
         match parts.len() {
             1 => {
                 // When length is 1, it's a direct signal or wire assignment
-                Self {
+                Ok(Self {
                     ctype: signal_or_wire!(parts[0]),
                     left: Type::None,
                     right: Type::None,
-                }
+                })
             }
 
             2 => {
                 // When length is 2, it must be a NOT gate
-                assert_eq!(parts[0], "NOT", "Invalid gate format");
-                Self {
-                    ctype: Type::Gate("NOT".to_string()),
-                    left: Type::None,
-                    right: signal_or_wire!(parts[1]),
+                if parts[0] == "NOT" {
+                    Ok(Self {
+                        ctype: Type::Gate("NOT".to_string()),
+                        left: Type::None,
+                        right: signal_or_wire!(parts[1]),
+                    })
+                } else {
+                    Err(AocError::ParseError(format!("Expected a NOT gate: {line}")))
                 }
             }
 
             3 => {
                 // When length is 3, it must be a binary gate
-                Self {
+                Ok(Self {
                     ctype: Type::Gate(parts[1].to_string()),
                     left: signal_or_wire!(parts[0]),
                     right: signal_or_wire!(parts[2]),
-                }
+                })
             }
 
             _ => {
                 // Any other length is invalid
-                panic!("Invalid component line: {}", line);
+                Err(AocError::ParseError(format!(
+                    "Invalid component line: {line}"
+                )))
             }
         }
     }
@@ -162,7 +168,7 @@ impl Wires {
         );
     }
 
-    pub fn from_input_data(input_data: &str) -> Self {
+    pub fn from_input_data(input_data: &str) -> Result<Self> {
         let mut wires = Self::new();
         // Parse each line into a Component and add it to the Wires hashmap
         for line in input_data.lines() {
@@ -171,18 +177,19 @@ impl Wires {
                 continue;
             }
             let parts: Vec<&str> = line.split(" -> ").map(|item| item.trim()).collect();
-            let component = Component::from_str(parts[0]);
+            let component = Component::from_str(parts[0])?;
             wires.0.insert(parts[1].to_string(), component);
         }
-        wires
+        Ok(wires)
     }
 
     pub fn all_known(&self) -> bool {
         self.0.values().all(|c| matches!(c.ctype, Type::Signal(_)))
     }
 
-    pub fn compute(&mut self) {
-        while !self.all_known() {
+    pub fn compute(&mut self) -> Result<()> {
+        let mut result: Result<()> = Ok(());
+        while !self.all_known() && result.is_ok() {
             self.0.clone().iter().for_each(|(k, v)| {
                 match v.ctype {
                     Type::Signal(_) => {}
@@ -221,7 +228,7 @@ impl Wires {
                                     "OR" => left_val | right_val,
                                     "LSHIFT" => left_val << right_val,
                                     "RSHIFT" => left_val >> right_val,
-                                    _ => unreachable!(),
+                                    _ => 0,
                                 };
                                 self.0.insert(
                                     k.clone(),
@@ -255,14 +262,15 @@ impl Wires {
                                 );
                             }
                         }
-                        _ => {
-                            println!("Unknown gate type: {}", gate_name);
+                        wtf => {
+                            result = Err(AocError::ParseError(format!("Unknown gate type: {wtf}")));
                         }
                     },
                     Type::None => {}
                 }
             });
         }
+        result
     }
 }
 
@@ -293,8 +301,8 @@ mod tests {
             NOT y -> i
         "#;
 
-        let mut wires = Wires::from_input_data(test_data);
-        wires.compute();
+        let mut wires = Wires::from_input_data(test_data).unwrap();
+        wires.compute().unwrap();
         assert_eq!(wires.all_known(), true);
     }
 }

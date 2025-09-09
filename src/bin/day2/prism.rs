@@ -1,3 +1,4 @@
+use common::error::Result;
 pub struct Prism {
     l: u32,
     w: u32,
@@ -5,13 +6,13 @@ pub struct Prism {
 }
 
 impl Prism {
-    pub fn from_str(s: &str) -> Self {
+    pub fn from_str(s: &str) -> Result<Self> {
         let dims: Vec<u32> = s.split('x').map(|x| x.parse::<u32>().unwrap()).collect();
-        Prism {
+        Ok(Prism {
             l: dims[0],
             w: dims[1],
             h: dims[2],
-        }
+        })
     }
 
     pub fn surface_area(&self) -> u32 {
@@ -50,7 +51,7 @@ mod tests {
 
     #[test]
     fn test_prism_from_str() {
-        let p = Prism::from_str("2x3x4");
+        let p = Prism::from_str("2x3x4").unwrap();
         assert_eq!(p.l, 2);
         assert_eq!(p.w, 3);
         assert_eq!(p.h, 4);
@@ -58,19 +59,19 @@ mod tests {
 
     #[test]
     fn test_surface_area() {
-        let p = Prism::from_str("2x3x4");
+        let p = Prism::from_str("2x3x4").unwrap();
         assert_eq!(p.surface_area(), 52);
     }
 
     #[test]
     fn test_smallest_side_area() {
-        let p = Prism::from_str("2x3x4");
+        let p = Prism::from_str("2x3x4").unwrap();
         assert_eq!(p.smallest_side_area(), 6);
     }
 
     #[test]
     fn test_smallest_perimeter() {
-        let p = Prism::from_str("2x3x4");
+        let p = Prism::from_str("2x3x4").unwrap();
         assert_eq!(p.smallest_perimeter(), 10);
     }
 }

@@ -1,3 +1,5 @@
+use common::error::{AocError, Result};
+
 enum State {
     Idle,
     InString,
@@ -6,19 +8,23 @@ enum State {
     SkipSecondHexDigit,
 }
 
-pub fn part1_delta_chars(line: &str) -> usize {
+pub fn part1_delta_chars(line: &str) -> Result<usize> {
     let mut delta = 2_usize; // We take into account the starting and ending double quotes, not in mem!
     let mut state = State::Idle;
 
     for ch in line.trim().chars() {
         match state {
             State::Idle => {
-                assert_eq!(ch, '"', "The line must start with a double quote");
+                if ch != '"' {
+                    return Err(AocError::ParseError(
+                        "The line must start with a double quote".to_string(),
+                    ));
+                }
                 state = State::InString;
             }
             State::InString => {
                 if ch == '"' {
-                    return delta;
+                    return Ok(delta);
                 }
 
                 if ch == '\\' {
@@ -34,8 +40,10 @@ pub fn part1_delta_chars(line: &str) -> usize {
                     delta += 3;
                     state = State::SkipFirstHexDigit;
                 }
-                _ => {
-                    panic!("Illegal escape character in line");
+                wtf => {
+                    return Err(AocError::ParseError(format!(
+                        "Illegal escape character '{wtf}' in {line}"
+                    )));
                 }
             },
             State::SkipFirstHexDigit => {
@@ -51,14 +59,18 @@ pub fn part1_delta_chars(line: &str) -> usize {
     unreachable!();
 }
 
-pub fn part2_delta_chars(line: &str) -> usize {
+pub fn part2_delta_chars(line: &str) -> Result<usize> {
     let mut delta = 2_usize; // We take into account the starting and ending double quotes, not in mem!
     let mut state = State::Idle;
 
     for ch in line.trim().chars() {
         match state {
             State::Idle => {
-                assert_eq!(ch, '"', "The line must start with a double quote");
+                if ch != '"' {
+                    return Err(AocError::ParseError(
+                        "The line must start with a double quote".to_string(),
+                    ));
+                }
                 delta += 1;
                 state = State::InString;
             }
@@ -72,7 +84,7 @@ pub fn part2_delta_chars(line: &str) -> usize {
             }
         }
     }
-    delta
+    Ok(delta)
 }
 
 #[cfg(test)]
@@ -86,7 +98,7 @@ mod tests {
     #[test_case(r#""aaa\"aaa""#, 3 ; "with escaped double quote") ]
     #[test_case(r#""\x27""#, 5 ; "with escaped hex char") ]
     fn part1_delta(line: &str, expected: usize) {
-        let delta = part1_delta_chars(line);
+        let delta = part1_delta_chars(line).unwrap();
         assert_eq!(delta, expected);
     }
 
@@ -95,7 +107,7 @@ mod tests {
     #[test_case(r#""aaa\"aaa""#, 6 ; "with escaped double quote") ]
     #[test_case(r#""\x27""#, 5 ; "with escaped hex char") ]
     fn part2_delta(line: &str, expected: usize) {
-        let delta = part2_delta_chars(line);
+        let delta = part2_delta_chars(line).unwrap();
         assert_eq!(delta, expected);
     }
 }

@@ -1,28 +1,30 @@
-pub fn floor_number_from_string(s: &String) -> i32 {
+use common::error::{AocError, Result};
+
+pub fn floor_number_from_string(s: &String) -> Result<i32> {
     let mut floor = 0;
     for ch in s.chars() {
         floor += match ch {
             '(' => 1,
             ')' => -1,
-            _ => 0,
+            other_ch => return Err(AocError::CharParseError(other_ch)),
         }
     }
-    floor
+    Ok(floor)
 }
 
-pub fn index_of_basement(s: &String) -> i32 {
+pub fn index_of_basement(s: &String) -> Result<i32> {
     let mut floor = 0;
     for (index, ch) in s.chars().enumerate() {
         floor += match ch {
             '(' => 1,
             ')' => -1,
-            _ => 0,
+            other_ch => return Err(AocError::CharParseError(other_ch)),
         };
         if floor == -1 {
-            return index as i32 + 1;
+            return Ok(index as i32 + 1);
         }
     }
-    0
+    Err(AocError::NotFound)
 }
 
 #[cfg(test)]
@@ -40,13 +42,13 @@ mod tests {
     #[test_case(")())())", -3; "t9")]
 
     fn floor_number_from_string(direction: &str, expected: i32) {
-        let result = super::floor_number_from_string(&direction.to_string());
+        let result = super::floor_number_from_string(&direction.to_string()).unwrap();
         assert_eq!(result, expected);
     }
     #[test_case(")", 1; "t1")]
     #[test_case("()())", 5; "t2")]
     fn index_of_basement(directions: &str, expected: i32) {
-        let result = super::index_of_basement(&directions.into());
+        let result = super::index_of_basement(&directions.into()).unwrap();
         assert_eq!(result, expected);
     }
 }

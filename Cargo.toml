@@ -11,6 +11,7 @@ path = "src/lib.rs"
 test-case = "*"
 
 [dependencies]
+anyhow = "1.0.99"
 itertools = "0.14.0"
 md5 = "0.8.0"
 serde_json = "1.0.143"

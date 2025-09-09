@@ -1,7 +1,9 @@
 mod part1;
 mod part2;
 mod prism;
-fn main() -> Result<(), String> {
+
+use common::error::Result;
+fn main() -> Result<()> {
     part1::run()?;
     part2::run()?;
     Ok(())

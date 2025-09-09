@@ -1,3 +1,5 @@
+use common::error::Result;
+
 fn is_nice(s: &str) -> bool {
     // Rule 1: it contains at least three vowels (aeiou only)
     let vowels = "aeiou";
@@ -22,7 +24,7 @@ fn is_nice(s: &str) -> bool {
     true
 }
 
-pub fn run() -> Result<(), String> {
+pub fn run() -> Result<()> {
     let input = common::read_input(5)?;
     let count = input.lines().filter(|line| is_nice(line)).count();
     println!("Number of 'nice' strings: {count}");

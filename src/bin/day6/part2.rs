@@ -1,10 +1,11 @@
 use crate::grid::Grid;
+use common::error::Result;
 
-pub fn run() -> Result<(), String> {
+pub fn run() -> Result<()> {
     let input = common::read_input(6)?;
     let mut grid = Grid::new(true);
     for line in input.lines() {
-        grid.apply_action(line);
+        grid.apply_action(line)?;
     }
     let total_brightness = grid.sum_brightness();
     println!("Total brightness: {total_brightness}");

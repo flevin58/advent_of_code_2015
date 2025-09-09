@@ -1,7 +1,8 @@
+mod round_table;
 mod part1;
 mod part2;
-use common::error::Result;
-fn main() -> Result<()> {
+
+fn main() -> Result<(), String> {
     part1::run()?;
     part2::run()?;
     Ok(())
