@@ -1,3 +1,4 @@
+use common::error::{AocError, Result};
 use itertools::Itertools;
 use std::fmt::Display;
 
@@ -9,15 +10,21 @@ pub struct LocationPair {
 }
 
 impl LocationPair {
-    pub fn from_string(s: &str) -> Self {
+    pub fn from_string(s: &str) -> Result<Self> {
         let parts: Vec<&str> = s.split_ascii_whitespace().collect();
-        Self {
+
+        let d = match parts[4].parse::<usize>() {
+            Ok(val) => val,
+            Err(e) => {
+                return Err(AocError::ParseError(e.to_string()));
+            }
+        };
+
+        Ok(Self {
             a: String::from(parts[0]),
             b: String::from(parts[2]),
-            d: String::from(parts[4])
-                .parse()
-                .unwrap_or_else(|e| panic!("{}", e)),
-        }
+            d,
+        })
     }
 }
 
@@ -99,13 +106,13 @@ impl Routes {
         }
     }
 
-    pub fn from_input_data(input_data: &str) -> Self {
+    pub fn from_input_data(input_data: &str) -> Result<Self> {
         let mut routes = Routes::new();
         let mut start_route = Route::new();
         for line in input_data.lines() {
             let lpline = line.trim();
             if !lpline.is_empty() {
-                let locp = LocationPair::from_string(lpline);
+                let locp = LocationPair::from_string(lpline)?;
                 start_route.add_location_pair(&locp);
                 routes.loc_pairs.push(locp);
             }
@@ -115,7 +122,7 @@ impl Routes {
         for item in perms {
             routes.routes.push(Route::from_string_vector(item));
         }
-        routes
+        Ok(routes)
     }
 
     fn distance_between_locations(&self, a: &String, b: &String) -> usize {
@@ -165,7 +172,7 @@ mod tests {
 
     #[test]
     fn distance_from_string() {
-        let location = LocationPair::from_string("London to Dublin = 464");
+        let location = LocationPair::from_string("London to Dublin = 464").unwrap();
         assert_eq!(location.a, String::from("London"));
         assert_eq!(location.b, String::from("Dublin"));
         assert_eq!(location.d, 464);
@@ -186,7 +193,7 @@ mod tests {
     #[test]
     fn route_add_location() {
         let mut route = Route::new();
-        route.add_location_pair(&LocationPair::from_string("London to Dublin = 464"));
+        route.add_location_pair(&LocationPair::from_string("London to Dublin = 464").unwrap());
         assert_eq!(
             route.0.iter().collect::<Vec<&String>>(),
             vec!["London", "Dublin"]
@@ -196,12 +203,12 @@ mod tests {
     #[test]
     fn get_shortest_route_distance() {
         let input_data = r#"
-            London to Dublin = 464
-            London to Belfast = 518
-            Dublin to Belfast = 141
-        "#;
+        London to Dublin = 464
+        London to Belfast = 518
+        Dublin to Belfast = 141
+    "#;
 
-        let routes = Routes::from_input_data(input_data);
+        let routes = Routes::from_input_data(input_data).unwrap();
         let shortest = routes.get_shortest_route_distance();
         assert_eq!(shortest, 605);
     }
@@ -209,12 +216,12 @@ mod tests {
     #[test]
     fn get_longest_route_distance() {
         let input_data = r#"
-            London to Dublin = 464
-            London to Belfast = 518
-            Dublin to Belfast = 141
-        "#;
+        London to Dublin = 464
+        London to Belfast = 518
+        Dublin to Belfast = 141
+    "#;
 
-        let routes = Routes::from_input_data(input_data);
+        let routes = Routes::from_input_data(input_data).unwrap();
         let longest = routes.get_longest_route_distance();
         assert_eq!(longest, 982);
     }

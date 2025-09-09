@@ -1,6 +1,7 @@
 use crate::round_table::RoundTable;
+use common::error::Result;
 
-pub fn run() -> Result<(), String> {
+pub fn run() -> Result<()> {
     let _input = common::read_input(13)?;
 
     let input = r#"
@@ -18,7 +19,7 @@ pub fn run() -> Result<(), String> {
         David would gain 41 happiness units by sitting next to Carol.
     "#;
 
-    let rt = RoundTable::from_input(&input.to_string());
+    let rt = RoundTable::from_input(&input.to_string())?;
     println!("{rt:?}");
     Ok(())
 }

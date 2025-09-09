@@ -2,7 +2,6 @@ pub fn after_iters(start: &str, n: i32) -> String {
     let mut start = String::from(start);
     for _ in 0..n {
         let end = read_aloud(&start);
-        // println!("{start} -> {end}");
         start = end;
     }
     start

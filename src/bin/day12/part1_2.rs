@@ -1,3 +1,4 @@
+use common::error::{AocError, Result};
 use serde_json::Value;
 
 trait Sum {
@@ -25,9 +26,10 @@ impl Sum for Value {
     }
 }
 
-pub fn run() -> Result<(), String> {
+pub fn run() -> Result<()> {
     let input = common::read_input(12)?;
-    let v: Value = serde_json::from_str(&input).unwrap();
+    let v: Value = serde_json::from_str(&input)
+        .map_err(|e| AocError::ParseError(format!("Failed to deserialize JSON: {e}")))?;
 
     println!("Sum: {}", v.sum(false));
     println!("Sum without red: {}", v.sum(true));
