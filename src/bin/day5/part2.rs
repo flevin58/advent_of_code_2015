@@ -1,4 +1,4 @@
-use common::error::Result;
+use anyhow::Result;
 
 fn is_nice(s: &str) -> bool {
     // Rule 1: it contains a pair of any two letters that appears at least twice in the string without overlapping

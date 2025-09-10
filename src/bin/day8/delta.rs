@@ -1,4 +1,4 @@
-use common::error::{AocError, Result};
+use anyhow::{Result, bail};
 
 enum State {
     Idle,
@@ -16,9 +16,7 @@ pub fn part1_delta_chars(line: &str) -> Result<usize> {
         match state {
             State::Idle => {
                 if ch != '"' {
-                    return Err(AocError::ParseError(
-                        "The line must start with a double quote".to_string(),
-                    ));
+                    bail!("The line must start with a double quote");
                 }
                 state = State::InString;
             }
@@ -41,9 +39,7 @@ pub fn part1_delta_chars(line: &str) -> Result<usize> {
                     state = State::SkipFirstHexDigit;
                 }
                 wtf => {
-                    return Err(AocError::ParseError(format!(
-                        "Illegal escape character '{wtf}' in {line}"
-                    )));
+                    bail!("Illegal escape character '{wtf}' in {line}");
                 }
             },
             State::SkipFirstHexDigit => {
@@ -67,9 +63,7 @@ pub fn part2_delta_chars(line: &str) -> Result<usize> {
         match state {
             State::Idle => {
                 if ch != '"' {
-                    return Err(AocError::ParseError(
-                        "The line must start with a double quote".to_string(),
-                    ));
+                    bail!("The line must start with a double quote");
                 }
                 delta += 1;
                 state = State::InString;

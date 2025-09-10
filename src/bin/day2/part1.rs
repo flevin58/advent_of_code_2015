@@ -1,5 +1,5 @@
 use crate::prism::Prism;
-use common::error::Result;
+use anyhow::Result;
 
 fn amount_of_wrapping_paper(single_line: &str) -> Result<u32> {
     let prism = Prism::from_str(single_line)?;

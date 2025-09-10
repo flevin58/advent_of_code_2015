@@ -1,4 +1,4 @@
-use common::error::{AocError, Result};
+use anyhow::{Result, bail};
 use itertools::Itertools;
 
 const MYSELF: &str = "Myself";
@@ -18,26 +18,14 @@ impl Happiness {
             .map(|s| s.to_string())
             .collect::<Vec<String>>();
         if parts.len() != 11 {
-            return Err(AocError::ParseError(format!(
-                "Found {} parts instead of 11 in '{}'",
-                parts.len(),
-                s
-            )));
+            bail!("Found {} parts instead of 11 in '{}'", parts.len(), s);
         }
-        let mut points = match parts[3].parse::<i32>() {
-            Ok(value) => value,
-            Err(e) => {
-                return Err(AocError::ParseError(e.to_string()));
-            }
-        };
+        let mut points = parts[3].parse::<i32>()?;
         points *= match parts[2].as_str() {
             "gain" => 1,
             "lose" => -1,
-            _ => {
-                return Err(AocError::ParseError(format!(
-                    "Expected 'gain' or 'lose', found '{}' instead.",
-                    parts[2]
-                )));
+            other => {
+                bail!("Expected 'gain' or 'lose', found '{other}' instead.");
             }
         };
         // Remove trailin 'dot' from next
@@ -111,9 +99,7 @@ impl RoundTable {
                 let left_points = self.happiness_of(&disp[i], person_left);
                 let right_points = self.happiness_of(&disp[i], person_right);
                 if left_points.is_none() || right_points.is_none() {
-                    return Err(AocError::ParseError(format!(
-                        "Bad table disposition: {disp:?}"
-                    )));
+                    bail!("Bad table disposition: {disp:?}");
                 }
                 disp_points += left_points.unwrap() + right_points.unwrap();
             }
@@ -136,9 +122,7 @@ impl RoundTable {
                 let left_points = self.happiness_of(&disp[i], person_left);
                 let right_points = self.happiness_of(&disp[i], person_right);
                 if left_points.is_none() || right_points.is_none() {
-                    return Err(AocError::ParseError(format!(
-                        "Bad table disposition: {disp:?}"
-                    )));
+                    bail!("Bad table disposition: {disp:?}");
                 }
                 disp_points += left_points.unwrap() + right_points.unwrap();
             }

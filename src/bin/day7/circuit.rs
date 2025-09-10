@@ -1,3 +1,9 @@
+use anyhow::{Result, bail};
+use std::{
+    collections::HashMap,
+    fmt::{Debug, Display},
+};
+
 macro_rules! signal_or_wire {
     ($x:expr) => {
         if let Ok(signal) = $x.parse::<u16>() {
@@ -7,12 +13,6 @@ macro_rules! signal_or_wire {
         }
     };
 }
-
-use common::error::{AocError, Result};
-use std::{
-    collections::HashMap,
-    fmt::{Debug, Display},
-};
 
 #[derive(Clone, PartialEq)]
 pub enum Type {
@@ -110,7 +110,7 @@ impl Component {
                         right: signal_or_wire!(parts[1]),
                     })
                 } else {
-                    Err(AocError::ParseError(format!("Expected a NOT gate: {line}")))
+                    bail!("Expected a NOT gate in '{line}'");
                 }
             }
 
@@ -125,9 +125,7 @@ impl Component {
 
             _ => {
                 // Any other length is invalid
-                Err(AocError::ParseError(format!(
-                    "Invalid component line: {line}"
-                )))
+                bail!("Invalid component line: {line}");
             }
         }
     }
@@ -188,11 +186,10 @@ impl Wires {
     }
 
     pub fn compute(&mut self) -> Result<()> {
-        let mut result: Result<()> = Ok(());
-        while !self.all_known() && result.is_ok() {
-            self.0.clone().iter().for_each(|(k, v)| {
+        while !self.all_known() {
+            self.0.clone().iter().try_for_each(|(k, v)| {
                 match v.ctype {
-                    Type::Signal(_) => {}
+                    Type::Signal(_) => Ok(()),
                     Type::Wire(ref wname) => {
                         if let Some(wire_comp) = self.0.get(wname) {
                             if let Type::Signal(value) = wire_comp.ctype {
@@ -203,6 +200,7 @@ impl Wires {
                                 comp.right = Type::None;
                             }
                         }
+                        Ok(())
                     }
                     Type::Gate(ref gate_name) => match gate_name.as_str() {
                         "AND" | "OR" | "LSHIFT" | "RSHIFT" => {
@@ -223,22 +221,23 @@ impl Wires {
                                 _ => None,
                             };
                             if let (Some(left_val), Some(right_val)) = (left_signal, right_signal) {
-                                let result = match gate_name.as_str() {
+                                let gate_val = match gate_name.as_str() {
                                     "AND" => left_val & right_val,
                                     "OR" => left_val | right_val,
                                     "LSHIFT" => left_val << right_val,
                                     "RSHIFT" => left_val >> right_val,
-                                    _ => 0,
+                                    _ => unreachable!(),
                                 };
                                 self.0.insert(
                                     k.clone(),
                                     Component {
-                                        ctype: Type::Signal(result),
+                                        ctype: Type::Signal(gate_val),
                                         left: Type::None,
                                         right: Type::None,
                                     },
                                 );
                             }
+                            Ok(())
                         }
                         "NOT" => {
                             let right_signal = match &v.right {
@@ -250,27 +249,28 @@ impl Wires {
                                 _ => None,
                             };
                             if let Some(right_val) = right_signal {
-                                let result = !right_val;
+                                let gate_val = !right_val;
                                 // Update the component to a signal
                                 self.0.insert(
                                     k.clone(),
                                     Component {
-                                        ctype: Type::Signal(result),
+                                        ctype: Type::Signal(gate_val),
                                         left: Type::None,
                                         right: Type::None,
                                     },
                                 );
                             }
+                            Ok(())
                         }
                         wtf => {
-                            result = Err(AocError::ParseError(format!("Unknown gate type: {wtf}")));
+                            bail!("Unknown gate type: '{wtf}'");
                         }
                     },
-                    Type::None => {}
+                    Type::None => Ok(()),
                 }
-            });
+            })?;
         }
-        result
+        Ok(())
     }
 }
 

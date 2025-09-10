@@ -1,4 +1,4 @@
-use common::error::{AocError, Result};
+use anyhow::Result;
 use itertools::Itertools;
 use std::fmt::Display;
 
@@ -12,14 +12,7 @@ pub struct LocationPair {
 impl LocationPair {
     pub fn from_string(s: &str) -> Result<Self> {
         let parts: Vec<&str> = s.split_ascii_whitespace().collect();
-
-        let d = match parts[4].parse::<usize>() {
-            Ok(val) => val,
-            Err(e) => {
-                return Err(AocError::ParseError(e.to_string()));
-            }
-        };
-
+        let d = parts[4].parse::<usize>()?;
         Ok(Self {
             a: String::from(parts[0]),
             b: String::from(parts[2]),

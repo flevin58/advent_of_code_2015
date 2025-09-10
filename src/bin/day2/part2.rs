@@ -1,6 +1,5 @@
-use common::error::Result;
-
 use crate::prism::Prism;
+use anyhow::Result;
 
 fn total_ribbon(single_line: &str) -> Result<u32> {
     let prism = Prism::from_str(single_line)?;

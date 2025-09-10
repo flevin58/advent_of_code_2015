@@ -1,4 +1,4 @@
-use common::error::{AocError, Result};
+use anyhow::{Result, bail};
 use itertools::Itertools;
 
 const GRID_SIZE: usize = 1000;
@@ -15,7 +15,7 @@ impl Pos {
         if parts.len() == 2 {
             Ok(Pos(parts[0], parts[1]))
         } else {
-            Err(AocError::NumParseError(str_pos.to_string()))
+            bail!(r#"Error parsing Pos from: "{str_pos}" "#)
         }
     }
 }
@@ -58,9 +58,7 @@ impl Grid {
                     self.lights_off(rect);
                 }
                 wtf => {
-                    return Err(AocError::ParseError(format!(
-                        "Expected 'on' or 'off' instead of '{wtf}'"
-                    )));
+                    bail!("Expected 'on' or 'off' instead of '{wtf}'");
                 }
             },
             "toggle" => {
@@ -68,9 +66,7 @@ impl Grid {
                 self.toggle_lights(rect);
             }
             wtf => {
-                return Err(AocError::ParseError(format!(
-                    "Expected 'turn' or 'toggle' instead of '{wtf}'"
-                )));
+                bail!("Expected 'turn' or 'toggle' instead of '{wtf}'");
             }
         }
         Ok(())

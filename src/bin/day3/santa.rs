@@ -1,4 +1,4 @@
-use common::error::{AocError, Result};
+use anyhow::{Result, bail};
 use std::collections::HashSet;
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
@@ -12,7 +12,7 @@ impl Pos {
             '<' => x -= 1,
             '^' => y += 1,
             'v' => y -= 1,
-            ch => return Err(AocError::CharParseError(ch)),
+            ch => bail!("Illegal direction: '{ch}'"),
         }
         Ok(Self(x, y))
     }

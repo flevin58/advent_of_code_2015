@@ -1,4 +1,4 @@
-use common::error::{AocError, Result};
+use anyhow::{Result, bail};
 
 pub fn floor_number_from_string(s: &String) -> Result<i32> {
     let mut floor = 0;
@@ -6,7 +6,9 @@ pub fn floor_number_from_string(s: &String) -> Result<i32> {
         floor += match ch {
             '(' => 1,
             ')' => -1,
-            other_ch => return Err(AocError::CharParseError(other_ch)),
+            other_ch => {
+                bail!("Bad character {other_ch}");
+            }
         }
     }
     Ok(floor)
@@ -18,13 +20,15 @@ pub fn index_of_basement(s: &String) -> Result<i32> {
         floor += match ch {
             '(' => 1,
             ')' => -1,
-            other_ch => return Err(AocError::CharParseError(other_ch)),
+            other_ch => {
+                bail!("Bad character {other_ch}");
+            }
         };
         if floor == -1 {
             return Ok(index as i32 + 1);
         }
     }
-    Err(AocError::NotFound)
+    bail!("Never reached the basement!");
 }
 
 #[cfg(test)]

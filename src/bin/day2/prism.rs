@@ -1,4 +1,4 @@
-use common::error::Result;
+use anyhow::Result;
 pub struct Prism {
     l: u32,
     w: u32,

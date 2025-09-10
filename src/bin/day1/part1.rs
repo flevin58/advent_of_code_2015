@@ -1,5 +1,5 @@
 use crate::floor;
-use common::error::Result;
+use anyhow::Result;
 
 pub fn run() -> Result<()> {
     let input = common::read_input(1)?;
