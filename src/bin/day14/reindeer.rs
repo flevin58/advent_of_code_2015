@@ -1,16 +1,13 @@
 use anyhow::{Result, bail};
-use std::cmp::max;
+use std::cmp::{max, min};
 
 #[derive(Debug)]
 pub struct Reindeer {
     #[allow(dead_code)]
     name: String,
-    #[allow(dead_code)]
     speed: i32,
     fly_time: i32,
     rest_time: i32,
-    #[allow(dead_code)]
-    secs: i32,
     dist: i32,
     points: i32,
 }
@@ -33,38 +30,20 @@ impl Reindeer {
             speed,
             fly_time,
             rest_time,
-            secs: 0,
             dist: 0,
             points: 0,
         })
     }
 
-    // |...fly...|... rest ...|...fly...|...rest...|
+    // |...fly...|... rest ...|...fly...|...rest...| -> cycle times
+    //                              ^ delta_sec (example) < fly_time
     pub fn distance_after(&self, secs: i32) -> i32 {
-        let totd = secs / (self.fly_time + self.rest_time);
-        let rels = secs % (self.fly_time + self.rest_time);
-        (totd + rels) * self.fly_time
-    }
-
-    #[cfg(windows)]
-    pub fn distance_after(&self, n: i32) -> i32 {
-        let mut secs = n;
-        let mut tot_distance = 0;
-
-        loop {
-            if secs >= self.fly_time {
-                tot_distance += self.fly_time * self.speed;
-                secs -= self.fly_time;
-            } else {
-                return tot_distance;
-            }
-
-            if secs >= self.rest_time {
-                secs -= self.rest_time;
-            } else {
-                return tot_distance;
-            }
-        }
+        let cycle = self.fly_time + self.rest_time;
+        let iterations = secs / cycle;
+        let delta_sec = secs % cycle;
+        let cycles_dist = iterations * self.speed * self.fly_time;
+        let delta_dist = min(delta_sec, self.fly_time) * self.speed;
+        cycles_dist + delta_dist
     }
 }
 
@@ -97,11 +76,12 @@ impl ReindeerList {
     }
 
     pub fn max_winning_points_after(&mut self, secs: i32) -> i32 {
-        for _ in 0..secs {
+        for s in 1..=secs {
             // Advance reindeers by 1 second and get max dist
             let mut max_dist = 0;
             for deer in self.list.iter_mut() {
-                deer.dist += deer.distance_after(1);
+                let dist = deer.distance_after(s);
+                deer.dist = dist;
                 max_dist = max(max_dist, deer.dist);
             }
             // Add 1 point to each winning deer
@@ -112,7 +92,7 @@ impl ReindeerList {
             }
         }
         // Return the max points among all deers
-        self.list.iter().map(|deer| deer.dist).max().unwrap_or(0)
+        self.list.iter().map(|deer| deer.points).max().unwrap_or(0)
     }
 }
 
